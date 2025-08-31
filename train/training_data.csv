@@ -1,0 +1,5 @@
+anchor,positive
+"table: customers column: cust_id","table: clients column: client identifier"
+"table: customers column: cust_addr","table: customer_data column: customer home address full"
+"table: products column: id","table: inventory column: product_id"
+"table: store_locations column: id","table: shops column: store_identifier"

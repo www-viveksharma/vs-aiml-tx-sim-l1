@@ -1,0 +1,90 @@
+abbreviation,full_form
+addr,address
+acct,account
+alt,alternate
+amt,amount
+assoc,associate
+avg,average
+bal,balance
+cat,category
+cnt,count
+cust,customer
+desc,description
+dept,department
+dob,date of birth
+dt,date
+emp,employee
+env,environment
+evt,event
+ext,extension
+fname,first name
+grp,group
+id,identifier
+img,image
+len,length
+lname,last name
+lic,license
+mgr,manager
+msg,message
+num,number
+op,operation
+ord,order
+pct,percent
+plc,place
+pop,population
+prd,product
+prof,profile
+qty,quantity
+rec,record
+ref,reference
+reg,region
+res,resident
+rev,revenue
+sal,salary
+seq,sequence
+src,source
+lin,line
+loc,location
+max,maximum
+min,minimum
+mom,month over month
+mth,month
+nbr,number
+num,number
+org,organization
+pct,percentage
+ph,phone
+pic,picture
+pos,position
+prd,period
+prev,previous
+qty,quantity
+ref,reference
+req,request
+resp,response
+sal,salary
+seq,sequence
+ssn,social security number
+sess,session
+sessn,session number
+src,source
+stat,status
+std,standard
+stdev,standard deviation
+sts,status
+stat,statistic
+sub,subject
+svc,service
+sz,size
+tel,telephone
+temp,temperature
+tot,total
+ts,timestamp
+tx,transaction
+typ,type
+usr,user
+vol,volume
+wt,weight
+yr,year
+yoy,year over year
+zip,zip code
