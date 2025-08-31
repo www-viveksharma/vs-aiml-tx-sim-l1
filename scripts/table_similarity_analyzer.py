@@ -16,6 +16,7 @@ class AbbreviationMapper:
         try:
             df = pd.read_csv(csv_path)
             self.abbreviation_map = dict(zip(df['abbreviation'], df['full_form']))
+            print(f"Loaded {len(self.abbreviation_map)} abbreviations.")
         except Exception as e:
             print(f"Warning: Could not load abbreviations file: {e}")
             self.abbreviation_map = {}
@@ -37,7 +38,7 @@ class ColumnNormalizer:
         # Split into words and expand each
         words = name.split()
         expanded_words = [self.abbreviation_mapper.expand_word(word) for word in words]
-        
+        print(f"\tNormalized '{name}' to '{' '.join(expanded_words)}'")
         return ' '.join(expanded_words)
 
 class SemanticTableMetadata:
@@ -66,7 +67,13 @@ class SemanticTableMetadata:
 class SemanticTableAnalyzer:
     def __init__(self, model_name: str = 'all-MiniLM-L6-v2'):
         self.embedding_model = SentenceTransformer(model_name)
-        self.abbreviation_mapper = AbbreviationMapper('column_abbreviations.csv')
+        
+        # Get the directory where this script is located
+        script_dir = Path(__file__).parent
+        # Construct path to resources relative to script location
+        abbreviations_path = script_dir.parent / 'resources' / 'column_abbreviations.csv'
+        
+        self.abbreviation_mapper = AbbreviationMapper(str(abbreviations_path))
         self.normalizer = ColumnNormalizer(self.abbreviation_mapper)
         
     def calculate_containment(
@@ -85,10 +92,17 @@ class SemanticTableAnalyzer:
         matched_columns = []
         total_matches = 0
         
+        print(f"\nComparing tables: {table_subset.table_name} → {table_superset.table_name}")
+        print(f"Similarity threshold: {similarity_threshold}")
+        
         for idx, subset_col_embedding in enumerate(table_subset.column_embeddings):
             # Calculate similarities with all superset columns
             similarities = util.cos_sim(subset_col_embedding, table_superset.column_embeddings)
             max_sim, max_idx = torch.max(similarities, dim=1)
+            
+            print(f"Column '{table_subset.columns[idx]['name']}' best match:")
+            print(f"  → '{table_superset.columns[max_idx.item()]['name']}'")
+            print(f"  → Similarity score: {max_sim.item():.3f}")
             
             if max_sim > similarity_threshold:
                 total_matches += 1
@@ -99,6 +113,7 @@ class SemanticTableAnalyzer:
                 })
         
         containment_score = total_matches / len(table_subset.columns)
+        print(f"Final containment score: {containment_score:.3f}")
         return containment_score, matched_columns
 
     def find_duplicate_and_subset_tables(
@@ -106,15 +121,15 @@ class SemanticTableAnalyzer:
         tables_metadata: List[Dict], 
         containment_threshold: float = 0.8
     ) -> List[Dict]:
-        """
-        Finds tables that are potential duplicates or subsets of other tables.
-        Returns detailed analysis including column-level matches.
-        """
+        print(f"\nAnalyzing {len(tables_metadata)} tables with containment threshold {containment_threshold}")
+        
         semantic_tables = []
         results = []
         
         # Convert raw metadata to SemanticTableMetadata objects
         for meta in tables_metadata:
+            print(f"\nProcessing table: {meta['db_name']}.{meta['table_name']}")
+            print(f"Columns: {[col['name'] for col in meta['columns']]}")
             semantic_table = SemanticTableMetadata(
                 meta['db_name'],
                 meta['table_name'],
@@ -156,6 +171,9 @@ class SemanticTableAnalyzer:
 
 # Example usage
 if __name__ == "__main__":
+
+    print("Starting table similarity analysis...")
+
     # Example metadata
     tables_metadata = [
         {
@@ -181,9 +199,13 @@ if __name__ == "__main__":
             ]
         }
     ]
+
+    print("INPUT : tables metadata is : ", tables_metadata)
     
     analyzer = SemanticTableAnalyzer()
     results = analyzer.find_duplicate_and_subset_tables(tables_metadata)
+    
+    print("OUTPUT : results from analysis is : ", results)
     
     # Print results
     for result in results:
